@@ -7,6 +7,11 @@ const MovingObject = require("./moving_object.js");
 const Player = require("./player.js");
 // END OF TESTING
 
+const newGame = (ctx) => {
+    const game = new Game();
+    new GameView(game, ctx).start();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const canvas = document.getElementById("myCanvas");
@@ -19,5 +24,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // END OF TESTING
 
     const game = new Game();
-    new GameView(game, ctx).start();
+    new GameView(game, ctx).showStartMenu(ctx);
+
+    document.addEventListener('keydown', (e) => {
+            // e.preventDefault();
+            console.log(e.code);
+            switch (e.code) {
+                case "KeyR":
+                    newGame(ctx)
+                    break
+            }
+    })
+
 })
+
+

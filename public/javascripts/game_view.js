@@ -46,6 +46,10 @@ class GameView {
         requestAnimationFrame(this.animate.bind(this));
     }
 
+    showStartMenu(ctx) {
+        this.game.drawStartMenu(ctx);
+    }
+
     animate(time) {
         if (!this.game.gameover) {
             const timeDelta = time - this.lastTime;
@@ -56,7 +60,10 @@ class GameView {
     
             // every call to animate requests causes another call to animate
             requestAnimationFrame(this.animate.bind(this));
+        } else {
+            this.game.drawGameOver(this.ctx)
         }
+        
     }
 }
 

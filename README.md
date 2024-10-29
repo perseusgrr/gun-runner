@@ -1,4 +1,4 @@
-# [Gun Runner](https://nickdraper8.github.io/gun-runner/)
+# Gun Runner
 A browser game by Nick Draper
 
 ## Backgound

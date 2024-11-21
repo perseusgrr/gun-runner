@@ -57,7 +57,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/public/";
+/******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 12);
@@ -1293,8 +1293,6 @@ document.addEventListener('DOMContentLoaded', () => {
     new GameView(game, ctx)
 
     document.addEventListener('keydown', (e) => {
-            // e.preventDefault();
-            // console.log(e.code);
             switch (e.code) {
                 case "KeyR":
                     newGame(ctx)
@@ -2274,7 +2272,11 @@ class Game {
 
     removeAllObjects() {
         this.allObjects().forEach(object => {
-            this.remove(object)
+            if (object instanceof Player) {
+                this.players.splice(this.players.indexOf(object), 1);
+            } else {
+                this.remove(object)
+            }
         })
     }
 
@@ -2526,7 +2528,7 @@ class Enemy extends AnimatedObject {
         this.xOffset = 10;
         this.yOffset = 5;
 
-        this.fps = 2;
+        this.fps = 8;
 
     }
 
@@ -2575,25 +2577,25 @@ class Enemy extends AnimatedObject {
         return false;
     }
 
-    drawFrame(ctx, frameX, frameY, canvasX, canvasY) {
-        ctx.drawImage(this.currentImage,
-                        frameX * this.spriteWidth, frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight,
-                        canvasX, canvasY, this.scaledWidth, this.scaledHeight);
-    }
+    // drawFrame(ctx, frameX, frameY, canvasX, canvasY) {
+    //     ctx.drawImage(this.currentImage,
+    //                     frameX * this.spriteWidth, frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight,
+    //                     canvasX, canvasY, this.scaledWidth, this.scaledHeight);
+    // }
 
-    draw(ctx) {
-        this.frameCount += 1;
-        this.drawFrame(ctx, this.cycleLoop[this.currentLoopIndex], 0, this.pos[0]-this.xOffset, this.pos[1]-this.yOffset);
-        if (this.frameCount < 10){
-            return
-        } else {
-            this.frameCount = 0;
-            this.currentLoopIndex++;
-            if (this.currentLoopIndex >= this.cycleLoop.length) {
-                this.currentLoopIndex = 0;
-            }
-        }
-    }
+    // draw(ctx) {
+    //     this.frameCount += 1;
+    //     this.drawFrame(ctx, this.cycleLoop[this.currentLoopIndex], 0, this.pos[0]-this.xOffset, this.pos[1]-this.yOffset);
+    //     if (this.frameCount < 10){
+    //         return
+    //     } else {
+    //         this.frameCount = 0;
+    //         this.currentLoopIndex++;
+    //         if (this.currentLoopIndex >= this.cycleLoop.length) {
+    //             this.currentLoopIndex = 0;
+    //         }
+    //     }
+    // }
 
 
 }
@@ -2629,6 +2631,10 @@ class GameView {
                 case "ArrowRight":
                     e.preventDefault();
                     game.dash();
+                    break
+                case "KeyR":
+                    game.removeAllObjects();
+                    break
             }
         })
     }
@@ -2683,14 +2689,14 @@ class GameView {
             this.game.draw(this.ctx);
             this.lastTime = time;
     
-            // every call to animate requests causes another call to animate
             requestAnimationFrame(this.animate.bind(this));
         } else {
+            this.game.removeAllObjects();
             document.querySelectorAll("#game-music")[0].pause();
             document.getElementById("background-gif").src = "/images/winterbackground_still.gif"
             document.getElementById("gameover-screen").classList.add("show");
             document.getElementById("open-menu-btn-container").classList.add("show");
-            // debugger
+
             if (this.handleHighscore()) {
                 document.getElementById("high-score-alert").innerHTML = `NEW HIGHSCORE: ${this.game.score} points`;
                 document.getElementById("victory").play();

@@ -1,0 +1,126 @@
+import AnimatedObject from "./animated_object";
+import Bullet from "./bullet";
+
+class Player extends AnimatedObject {
+  constructor({
+    vel = [0, 0],
+    pos = [80, 220],
+    height = 60,
+    width = 30,
+    scale = 2,
+  }) {
+    super({ vel, pos, height, width, scale });
+    // this.setupImages();
+    this.cycleLoop = [0, 1, 2, 3, 4, 5];
+
+    this.isJumping = false;
+    this.isFalling = false;
+    this.isReloading = false;
+
+    this.spriteHeight = 60;
+    this.spriteWidth = 48;
+
+    this.scaledHeight = this.scale * this.spriteHeight;
+    this.scaledWidth = this.scale * this.spriteWidth;
+
+    this.fps = 5;
+
+    this.xOffset = 30;
+    this.yOffset = 10;
+  }
+
+  update() {
+    // console.log(`Player POSrr: ${this.pos}`)
+    // console.log(`Player VEL: ${this.vel}`)
+    if (this.isFalling) {
+      // debugger
+      this.vel[1] = this.vel[1] + this.vel[1] * 0.2;
+      // debugger
+      if (this.pos[1] >= 200) {
+        this.land();
+      }
+    } else if (this.isJumping) {
+      this.vel[1] *= 0.84;
+      if (this.vel[1] > -0.5) {
+        this.fall();
+      }
+    }
+  }
+
+  setupImages() {
+    this.runningImg = new Image();
+    this.runningImg.src = `/images/Gunner_${this.color}_Run.png`;
+    this.jumpingImg = new Image();
+    this.jumpingImg.src = `/images/Gunner_${this.color}_Jump.png`;
+
+    this.currentImage = this.runningImg;
+  }
+
+  jump() {
+    if (!this.isJumping) {
+      document.getElementById("jump").play();
+      this.isJumping = true;
+      this.vel = [0, -25];
+      this.currentImage = this.jumpingImg;
+      this.cycleLoop = [0];
+      this.currentLoopIndex = 0;
+    }
+  }
+
+  fall() {
+    this.isFalling = true;
+    this.vel = [0, 0.5];
+    this.cycleLoop = [1];
+    this.currentLoopIndex = 0;
+  }
+
+  land() {
+    this.isJumping = false;
+    this.isFalling = false;
+    this.vel = [0, 0];
+    this.pos = [100, 220];
+    this.currentImage = this.runningImg;
+    this.cycleLoop = [0, 1, 2, 3, 4, 5];
+    this.currentLoopIndex = 0;
+  }
+
+  reload() {
+    document.getElementById("gunshot").pause();
+    document.getElementById("gunshot").currentTime = 0;
+
+    this.isReloading = false;
+  }
+
+  animateReloadBar() {
+    document
+      .getElementById("reload-bar-inner-green")
+      .classList.remove("inner-bar-to-0");
+    document
+      .getElementById("reload-bar-inner-green")
+      .classList.add("inner-reload-bar-fill");
+  }
+
+  fireBullet() {
+    if (!this.isReloading) {
+      document.getElementById("gunshot").play();
+      let bulletPos = [this.pos[0], this.pos[1] + 25];
+      const bullet = new Bullet({});
+      bullet.pos = bulletPos;
+      bullet.game = this.game;
+      this.game.add(bullet);
+      this.isReloading = true;
+
+      document
+        .getElementById("reload-bar-inner-green")
+        .classList.remove("inner-reload-bar-fill");
+      document
+        .getElementById("reload-bar-inner-green")
+        .classList.add("inner-bar-to-0");
+
+      setTimeout(this.animateReloadBar.bind(this), 100);
+      setTimeout(this.reload.bind(this), 700);
+    }
+  }
+}
+
+export default Player;

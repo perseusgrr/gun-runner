@@ -1,41 +1,25 @@
-const express = require('express')
-const app = express()
-const path = require('path')
-const fetch = require('node-fetch')
-const PORT = process.env.PORT || 8000; // process.env accesses heroku's environment variables
+const express = require("express");
+const path = require("path");
+const app = express();
 
-app.use(express.static('public'))
+const isProd = process.env.NODE_ENV === "production";
 
-app.get('/', (request, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
-})
+if (isProd) {
+  // Serve static files from Vite build
+  app.use(express.static(path.join(__dirname, "dist")));
+  app.use((req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+  });
+} else {
+  console.log("Running in development mode with Vite proxy");
+}
 
-// // create route to get single book by its isbn
-// app.get('/books/:isbn', (request, response) => {
-//   // make api call using fetch
-//   fetch(`http://openlibrary.org/api/books?bibkeys=ISBN:${request.params.isbn}&format=json&jscmd=data`)
-//   .then((response) => {
-//       return response.text();
-//   }).then((body) => {
-//       let results = JSON.parse(body)
-//       console.log(results)   // logs to server
-//       response.send(results) // sends to frontend
-//     });
-// });
+// Example API route
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Hello from Express backend!" });
+});
 
-// // create a search route
-// app.get('/search', (request, response) => {
-//   fetch(`http://openlibrary.org/search.json?q=${request.query.string}`)
-//   .then((response) => {
-//       return response.text();
-//   }).then((body) => {
-//       let results = JSON.parse(body)
-//       console.log(results)
-//       response.send(results)
-//     });
-// });
-
-app.listen(PORT, () => {
-  console.log(__dirname);
-  console.log(`listening on ${PORT}`)
-})
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server listening on http://localhost:${port}`);
+});
